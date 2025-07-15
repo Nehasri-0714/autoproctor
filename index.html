@@ -2,11 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Supervised Learning Quiz with AutoProctor</title>
-
-  <!-- AutoProctor Libraries -->
-  <script src="https://cdn.autoproctor.co/ap-entry.js"></script>
-
+  <title>Supervised Learning Quiz</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -67,29 +63,12 @@
     .container {
       margin-top: 30px;
     }
-
-    #ap-test-proctoring-status {
-      font-size: 18px;
-      text-align: center;
-      margin-top: 10px;
-    }
-
-    #debug-log {
-      background: #333;
-      color: #f0f0f0;
-      padding: 10px;
-      margin-top: 10px;
-      font-family: monospace;
-    }
   </style>
 </head>
 <body>
   <h1>Supervised Learning Quiz (5 Questions)</h1>
 
-  <div id="ap-test-proctoring-status">🧪 Initializing Proctoring...</div>
-  <div id="debug-log">📄 Debug log initializing...</div>
-
-  <div id="quiz-container" style="display:none;">
+  <div class="container">
     <form id="quizForm"></form>
     <div style="text-align:center;">
       <button type="button" onclick="submitQuiz()">Submit Quiz</button>
@@ -97,67 +76,6 @@
     <div id="result"></div>
   </div>
 
-  <!-- AutoProctor Setup -->
-  <script>
-    const CLIENT_ID = "tnmvX6pir7";
-
-    const getTestAttemptId = () => Math.random().toString(36).slice(2, 7);
-
-    const debug = (msg) => {
-      const log = document.getElementById("debug-log");
-      log.innerHTML += `<br>${new Date().toLocaleTimeString()}: ${msg}`;
-      console.log("[DEBUG]", msg);
-    };
-
-    async function init() {
-      const testAttemptId = getTestAttemptId();
-      debug(`Generated testAttemptId: ${testAttemptId}`);
-
-      const credentials = {
-        clientId: CLIENT_ID,
-        testAttemptId: testAttemptId
-        // No hashedTestAttemptId used here
-      };
-
-      const proctoringOptions = {
-        trackingOptions: {
-          audio: true,
-          numHumans: true,
-          tabSwitch: true,
-          detectMultipleScreens: true,
-          recordSession: true
-        },
-        showHowToVideo: false
-      };
-
-      try {
-        const apInstance = new AutoProctor(credentials);
-        await apInstance.setup(proctoringOptions);
-        debug("✅ AutoProctor setup completed");
-
-        await apInstance.start();
-        debug("🚀 Proctoring started");
-
-        window.addEventListener("apMonitoringStarted", () => {
-          document.getElementById("ap-test-proctoring-status").innerText = "✅ Proctoring Started!";
-          document.getElementById("quiz-container").style.display = "block";
-        });
-
-        window.addEventListener("apMonitoringStopped", () => {
-          document.getElementById("ap-test-proctoring-status").innerText = "⛔ Proctoring stopped.";
-        });
-
-      } catch (err) {
-        console.error("Error during proctoring setup/start:", err);
-        debug(`❌ Error: ${err.message || err}`);
-        alert("Proctoring failed to start. Check console for details.");
-      }
-    }
-
-    window.addEventListener("load", init);
-  </script>
-
-  <!-- Quiz Logic -->
   <script>
     const quizData = [
       {
