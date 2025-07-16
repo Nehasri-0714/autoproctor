@@ -1,0 +1,102 @@
+[
+  {
+    "question": "Which SQL command is used to retrieve data from a database?",
+    "options": ["GET", "FETCH", "RETRIEVE", "SELECT"],
+    "answer": "SELECT"
+  },
+  {
+    "question": "Which SQL keyword is used to filter the results of a query?",
+    "options": ["FILTER", "SEARCH", "WHERE", "LOCATE"],
+    "answer": "WHERE"
+  },
+  {
+    "question": "Which data type is used to store character strings in SQL?",
+    "options": ["CHAR", "NUMERIC", "FLOAT", "BIT"],
+    "answer": "CHAR"
+  },
+  {
+    "question": "Which data type in SQL is best for storing a very large range of numbers?",
+    "options": ["SMALLINT", "TINYINT", "BIGINT", "MEDIUMINT"],
+    "answer": "BIGINT"
+  },
+  {
+    "question": "Which SQL keyword is used to sort the results in descending order?",
+    "options": ["SORT DESC", "ARRANGE DESC", "LIST DESCENDING", "ORDER BY DESC"],
+    "answer": "ORDER BY DESC"
+  },
+  {
+    "question": "How can you prevent SQL injection in your queries?",
+    "options": ["Using Regular Expressions", "Concatenating Strings", "Using Prepared Statements", "Using global variables"],
+    "answer": "Using Prepared Statements"
+  },
+  {
+    "question": "In SQL, which command is used to insert new data into a database?",
+    "options": ["ADD", "APPEND", "INSERT", "ATTACH"],
+    "answer": "INSERT"
+  },
+  {
+    "question": "Which SQL statement is used to delete data from a database?",
+    "options": ["REMOVE", "DELETE", "ERASE", "DISCARD"],
+    "answer": "DELETE"
+  },
+  {
+    "question": "What does the SQL DISTINCT keyword do?",
+    "options": ["Count rows in a table", "Return unique values in the output", "Filter rows based on condition", "Join two tables"],
+    "answer": "Return unique values in the output"
+  },
+  {
+    "question": "Which SQL function returns the number of rows in a table?",
+    "options": ["SUM()", "COUNT()", "MAX()", "UNIQUE()"],
+    "answer": "COUNT()"
+  },
+  {
+    "question": "What is the type of the following? x = 10.5",
+    "options": ["int", "float", "str", "bool"],
+    "answer": "float"
+  },
+  {
+    "question": "Which of the following is NOT a mutable data type?",
+    "options": ["list", "dict", "tuple", "set"],
+    "answer": "tuple"
+  },
+  {
+    "question": "What data type is x after x = \"1000\"?",
+    "options": ["int", "str", "float", "bool"],
+    "answer": "str"
+  },
+  {
+    "question": "Which operator is used to check if two variables are equal in value?",
+    "options": ["=", "==", "!=", ":="],
+    "answer": "=="
+  },
+  {
+    "question": "How would you define a multi-line string in Python?",
+    "options": ["Using single quotes", "Using double quotes", "Using triple single quotes", "Using a comma"],
+    "answer": "Using triple single quotes"
+  },
+  {
+    "question": "Which of the following is the correct way to declare a global variable inside a function?",
+    "options": ["global x", "x = global", "global = x", "x(global)"],
+    "answer": "global x"
+  },
+  {
+    "question": "Which Python data type is ordered and changeable, but does not allow duplicate members?",
+    "options": ["list", "tuple", "set", "dict"],
+    "answer": "set"
+  },
+  {
+    "question": "Which of the following values is considered \"falsy\" in Python?",
+    "options": ["\"False\"", "[]", "1", "\"True\""],
+    "answer": "[]"
+  },
+  {
+    "question": "Which data type would you use to store a collection of key-value pairs?",
+    "options": ["list", "set", "tuple", "dict"],
+    "answer": "dict"
+  },
+  {
+    "question": "What is the type of z after executing the following code: z = 2 + 3j?",
+    "options": ["int", "float", "complex", "tuple"],
+    "answer": "complex"
+  }
+]

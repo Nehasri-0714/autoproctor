@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quiz 360DigiTMG</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Timed, proctored, AI/ML multiple-choice quiz for 360DigiTMG students.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.autoproctor.co/ap-entry.js"></script>
+</head>
+<body>
+  <!-- Page Transitions Overlay -->
+  <div class="page-fade" id="pageFade"></div>
+
+  <div class="container">
+    <header class="header-bar">
+      <img src="/assets/logo.png" alt="360DigiTMG Logo" class="logo"/>
+      <div>
+        <span class="quiz-title">AI/ML Quiz Test</span>
+      </div>
+      <div class="timer" id="timer"></div>
+    </header>
+
+    <main>
+      <!-- Instructions Card -->
+      <section class="instructions card" id="instructionsCard">
+        <h2>Getting Started</h2>
+        <ul class="instructions-list">
+          <li><strong>20 questions</strong> on Artificial Intelligence & Machine Learning fundamentals.</li>
+          <li><strong>20 minutes</strong> total. Timer auto-submits your quiz when it ends.</li>
+          <li>Your camera and mic are monitored for <strong>integrity</strong> (AutoProctor enabled).</li>
+          <li>You’ll see only <strong>one question at a time</strong>:: use <span class="brand-navy">Next</span> or <span class="brand-accent">Previous</span> to navigate.</li>
+          <li>Score and review appear at the end.</li>
+        </ul>
+        <button id="startQuizBtn" class="button-primary cta-pulse">Start Quiz</button>
+      </section>
+
+      <!-- QUIZ CARD (hidden until start) -->
+      <section id="quizCard" class="card quiz-card hide" aria-live="polite">
+        <div class="quiz-progress">
+          <span id="progressText"></span>
+          <div class="progress-bar-bg"><div id="progressBar" class="progress-bar"></div></div>
+        </div>
+        <form id="quizForm">
+          <fieldset>
+            <legend class="question-title" id="questionText"></legend>
+            <div id="optionsList" class="options-list"></div>
+          </fieldset>
+        </form>
+        <div class="nav-buttons">
+          <button type="button" class="button-primary" id="prevBtn">Previous</button>
+          <button type="button" class="button-primary" id="nextBtn">Next</button>
+          <button type="button" class="button-accent" id="submitBtn">Submit</button>
+        </div>
+      </section>
+
+      <!-- RESULT (hidden) -->
+      <section id="resultCard" class="result-box hide" tabindex="0" aria-live="polite"></section>
+    </main>
+
+    <footer class="footer">
+      © 2025 360DigiTMG. All rights reserved.
+      <span class="footer-note">Powered & proctored by <strong>AutoProctor</strong></span>
+    </footer>
+  </div>
+  <div class="snackbar" id="snackbar"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
