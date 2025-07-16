@@ -3,6 +3,63 @@
  * Author: [Your Name/Team]
  */
 
+// === CONFIG: AutoProctor Credentials ===
+const CLIENT_ID = null; // INSERT YOUR ID HERE!!!!
+const CLIENT_SECRET = null; // INSERT YOUR SECRET HERE!!!!
+
+const getTestAttemptId = () => Math.random().toString(36).slice(2, 7);
+
+function getHashTestAttemptId(testAttemptId) {
+  if (CLIENT_SECRET === null) {
+    return null;
+  } else {
+    const secretWordArray = CryptoJS.enc.Utf8.parse(CLIENT_SECRET);
+    const messageWordArray = CryptoJS.enc.Utf8.parse(testAttemptId);
+    const hash = CryptoJS.HmacSHA256(messageWordArray, secretWordArray);
+    const base64HashedString = CryptoJS.enc.Base64.stringify(hash);
+    return base64HashedString;
+  }
+}
+
+function getCredentials() {
+  const testAttemptId = getTestAttemptId();
+  const hashedTestAttemptId = getHashTestAttemptId(testAttemptId);
+  return {
+    clientId: CLIENT_ID,
+    testAttemptId,
+    hashedTestAttemptId
+  };
+}
+
+const getReportOptions = () => {
+  return {
+    groupReportsIntoTabs: true,
+    userDetails: {
+      name: "First Last",
+      email: "user@gmail.com"
+    }
+  };
+};
+
+// === Proctor Setup ===
+let proctorReady = false;
+
+async function setupProctoring() {
+  try {
+    const creds = getCredentials();
+    window.apconfig = {
+      testCode: "LAuLBQfDu0",
+      userId: creds.clientId,
+      hashedTestAttemptId: creds.hashedTestAttemptId,
+      startAutomatically: true
+    };
+    proctorReady = true;
+  } catch (err) {
+    snackbar('Unable to initialize proctor. Reload the page.', 7000);
+    proctorReady = false;
+  }
+}
+
 // === DOM Elements ===
 const $startBtn = document.getElementById('startQuizBtn');
 const $instructions = document.getElementById('instructionsCard');
@@ -27,59 +84,7 @@ let answers = [];
 let timerSeconds = 0;
 let timerHandle = null;
 const maxTime = 20 * 60, numQuestions = 20;
-
 let isLocked = false;
-
-// === Utility ===
-function shuffle(array) {
-  let a = array.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-// ==== Proctor Integration: SAFE API Fetch ====
-let proctorReady = false;
-async function setupProctoring() {
-  try {
-    // Fetch hashedTestAttemptId from backend REST API (should be auth-protected)
-    const resp = await fetch('/api/getAutoproctorId', { credentials: 'include' });
-    const data = await resp.json();
-    window.apconfig = {
-      testCode: "YOUR_AUTO_PROCTOR_TEST_CODE", // <-- replace as needed
-      userId: data.userEmail, // should be from the current logged in session
-      hashedTestAttemptId: data.hashedAttemptId,
-      startAutomatically: true
-    };
-    proctorReady = true;
-  } catch (err) {
-    snackbar('Unable to initialize proctor. Reload the page.', 7000);
-    proctorReady = false;
-  }
-}
-
-// ==== Timer ====
-function formatTime(sec) {
-  const m = Math.floor(sec / 60), s = sec % 60;
-  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-}
-function startTimer() {
-  timerSeconds = maxTime;
-  $timer.textContent = formatTime(timerSeconds);
-  timerHandle = setInterval(() => {
-    timerSeconds--;
-    $timer.textContent = formatTime(timerSeconds);
-    if(timerSeconds <= 60 && timerSeconds > 0)
-      $timer.style.background = "#e57300";
-    else if(timerSeconds === 0) {
-      $timer.style.background = "#ad3322";
-      clearInterval(timerHandle);
-      submitQuiz();
-    }
-  }, 1000);
-}
 
 // ==== Loader: entrance fade ====
 window.addEventListener('DOMContentLoaded', () => {
@@ -100,7 +105,6 @@ $startBtn.onclick = async function() {
     snackbar("Quiz proctoring not ready...", 5000);
     return;
   }
-  // Fade out instructions – microtransition
   $instructions.classList.add('hide');
   setTimeout(() => {
     $instructions.style.display="none";
@@ -121,27 +125,20 @@ async function fetchQuestions() {
     renderQuestion();
     updateNav();
     startTimer();
-    announceQuiz();
+    snackbar("Quiz started. Good luck!", 1800);
   } catch (err) {
     snackbar('Unable to load questions. Please reload.', 5000);
   }
 }
 
-function announceQuiz() {
-  snackbar("Quiz started. Good luck!", 1800);
-}
-
-// ==== Render ====
 function renderQuestion() {
   const q = questions[currentIdx];
   $questionText.textContent = q.question;
   $optionsList.innerHTML = '';
-  // Option shuffling for randomness
   const opts = shuffle(q.options);
   opts.forEach(opt => {
     const row = document.createElement('div');
     row.className = 'option-row';
-    // Checked status
     const iid = `option_${currentIdx}_${opt.replace(/\W+/g,'')}`;
     const checked = answers[currentIdx] === opt;
     row.innerHTML = `
@@ -151,26 +148,47 @@ function renderQuestion() {
         <span>${opt}</span>
       </label>
     `;
-    // Selection Event
     row.querySelector('input').onchange = (e) => {
       answers[currentIdx] = e.target.value;
-      // Optionally, transient checkmark/animation
       row.classList.add('just-checked');
       setTimeout(()=>row.classList.remove('just-checked'), 500);
     };
     $optionsList.appendChild(row);
   });
-  // Progress
   $progressText.textContent = `Question ${currentIdx+1} of ${questions.length}`;
   $progressBar.style.width = `${((currentIdx+1)/questions.length)*100}%`;
-
-  // Accessibility
-  setTimeout(()=> {
-    $questionText.focus && $questionText.focus();
-  }, 110);
 }
 
-// ==== Navigation ====
+function shuffle(array) {
+  let a = array.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startTimer() {
+  timerSeconds = maxTime;
+  $timer.textContent = formatTime(timerSeconds);
+  timerHandle = setInterval(() => {
+    timerSeconds--;
+    $timer.textContent = formatTime(timerSeconds);
+    if(timerSeconds <= 60 && timerSeconds > 0)
+      $timer.style.background = "#e57300";
+    else if(timerSeconds === 0) {
+      $timer.style.background = "#ad3322";
+      clearInterval(timerHandle);
+      submitQuiz();
+    }
+  }, 1000);
+}
+
+function formatTime(sec) {
+  const m = Math.floor(sec / 60), s = sec % 60;
+  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
+
 function updateNav() {
   $prevBtn.style.display = currentIdx > 0 ? '' : 'none';
   $nextBtn.style.display = currentIdx < questions.length-1 ? '' : 'none';
@@ -183,6 +201,7 @@ $prevBtn.onclick = function() {
   renderQuestion();
   updateNav();
 };
+
 $nextBtn.onclick = function() {
   if (isLocked || currentIdx === questions.length-1) return;
   if (!answers[currentIdx]) return snackbar("Select an answer before proceeding.");
@@ -190,21 +209,19 @@ $nextBtn.onclick = function() {
   renderQuestion();
   updateNav();
 };
+
 $submitBtn.onclick = function() {
   if (isLocked) return;
   if (!answers[currentIdx]) return snackbar("Select an answer before submitting.");
   submitQuiz();
 };
 
-// ==== Submission Logic ====
 function submitQuiz() {
-  // Lock further interaction
   isLocked = true;
   clearInterval(timerHandle);
   $quizCard.classList.add('hide');
   setTimeout(() => {
     showResult();
-    // Focus for accessibility, reader
     $resultCard.focus();
   }, 420);
 }
@@ -214,10 +231,8 @@ function showResult() {
   for(let i=0;i<questions.length;i++) {
     if(answers[i] === questions[i].answer) score++;
   }
-  // Celebrate with animated score + confetti emoji + CTA
   $resultCard.classList.remove('hide');
   $resultCard.setAttribute('tabindex','0');
-  // Progressive Score Reveal (animated)
   $resultCard.innerHTML = `
     <div class="confetti-emoji">🎉</div>
     <div id="animatedScore" style="font-size:3.3rem; font-family: inherit; margin:14px 0;">Score: 0 / ${questions.length}</div>
@@ -238,24 +253,3 @@ function animateScoreReveal(score, total) {
     displayed++;
   }, Math.max(18, 140 - score*6));
 }
-
-// ==== Focus & Accessibility ====
-window.onkeydown = e => {
-  if(!$quizCard.classList.contains('hide')){
-    if(e.key === "ArrowRight" && $nextBtn.style.display !== 'none') $nextBtn.click();
-    if(e.key === "ArrowLeft" && $prevBtn.style.display !== 'none') $prevBtn.click();
-  }
-};
-// Allow focus on first option after question render
-$optionsList && $optionsList.addEventListener('keydown', function(e){
-  if(e.key === 'ArrowDown' || e.key === 'ArrowUp'){
-    const radios = $optionsList.querySelectorAll('input[type="radio"]');
-    let idx = Array.from(radios).findIndex(r=>r===document.activeElement);
-    if(e.key === 'ArrowDown') idx = (idx+1)%radios.length;
-    if(e.key === 'ArrowUp') idx = (idx-1+radios.length)%radios.length;
-    radios[idx].focus();
-  }
-});
-
-// ==== Micro-animations for engagement ====
-// Transition overlays, highlight answer, cta pulse

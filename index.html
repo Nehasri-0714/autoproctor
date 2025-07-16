@@ -8,6 +8,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css" />
+  
+  <!-- CryptoJS for hashing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <!-- AutoProctor SDK -->
   <script src="https://cdn.autoproctor.co/ap-entry.js"></script>
 </head>
 <body>
@@ -58,6 +62,23 @@
 
       <!-- RESULT (hidden) -->
       <section id="resultCard" class="result-box hide" tabindex="0" aria-live="polite"></section>
+
+      <!-- AutoProctor UI Section -->
+      <section class="card" id="ap-proctoring-container">
+        <h3>Proctoring Controls</h3>
+        <div class="ctas">
+          <button id="btn-start">Start Proctoring</button>
+          <button id="btn-stop" disabled>Stop Proctoring</button>
+        </div>
+        <div class="flex flex-row">
+          <div id="ap-test-proctoring-status"></div>
+          <div id="proctor-feedback"></div>
+        </div>
+      </section>
+
+      <div class="container mx-auto mt-8 max-w-5xl" id="ap-report__overview"></div>
+      <div class="container mx-auto mt-8 max-w-5xl" id="ap-report-tab-container"></div>
+
     </main>
 
     <footer class="footer">
@@ -65,7 +86,54 @@
       <span class="footer-note">Powered & proctored by <strong>AutoProctor</strong></span>
     </footer>
   </div>
+
+  <!-- Snackbar Alert -->
   <div class="snackbar" id="snackbar"></div>
+
+  <!-- Main JS -->
   <script src="/app.js"></script>
+
+  <!-- AutoProctor Control Script -->
+  <script>
+    const proctoringOptions = {
+      trackingOptions: {
+        audio: true,
+        numHumans: true,
+        tabSwitch: true,
+        photosAtRandom: false,
+        detectMultipleScreens: true,
+        forceFullScreen: false,
+        auxiliaryDevice: false,
+        recordSession: true
+      },
+      showHowToVideo: false
+    };
+
+    async function init() {
+      const credentials = getCredentials(); // from app.js
+      const apInstance = new AutoProctor(credentials);
+      await apInstance.setup(proctoringOptions);
+
+      document.getElementById("btn-start").addEventListener("click", () => apInstance.start());
+
+      window.addEventListener("apMonitoringStarted", () => {
+        document.getElementById("btn-start").disabled = true;
+        document.getElementById("btn-stop").disabled = false;
+        document.getElementById("ap-test-proctoring-status").innerHTML = "Proctoring started...";
+      });
+
+      document.getElementById("btn-stop").addEventListener("click", () => apInstance.stop());
+
+      window.addEventListener("apMonitoringStopped", () => {
+        const reportOptions = getReportOptions(); // from app.js
+        apInstance.showReport(reportOptions);
+        document.getElementById("ap-test-proctoring-status").innerHTML = "Proctoring stopped.";
+        document.getElementById("btn-stop").disabled = true;
+      });
+    }
+
+    window.addEventListener("load", init);
+  </script>
 </body>
 </html>
+
